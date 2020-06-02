@@ -9,7 +9,7 @@ use wdmg\robots\models\Rules;
 /**
  * RulesSearch represents the model behind the search form of `wdmg\robots\models\Rules`.
  */
-class RulesSearch extends Votes
+class RulesSearch extends Rules
 {
     /**
      * {@inheritdoc}
