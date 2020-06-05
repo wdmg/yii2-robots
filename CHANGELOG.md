@@ -1,7 +1,7 @@
 Changelog
 =========
  
-## 1.0.0
+## 1.0.0 (2020-06-05)
  * Filtering in GridView
  * Rename repository, translations
  * Added CRUD for manage rules
