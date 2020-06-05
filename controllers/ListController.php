@@ -211,7 +211,8 @@ class ListController extends Controller
         if (Yii::$app->request->isAjax) {
             $source = $this->module->getRobotsTxt();
             return $this->renderAjax('_view', [
-                'source' => $source
+                'source' => $source,
+                'path' => Yii::getAlias('@web/robots.txt')
             ]);
         }
         $this->redirect(['index']);

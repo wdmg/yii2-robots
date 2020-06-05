@@ -24,13 +24,13 @@ return [
     'Re-generate' => "Сгенерировать",
     'View robots.txt' => "Просмотр robots.txt",
     'Add new rule' => "Добавить правило",
-    'Update rule' => "Редиктирование правила",
+    'Update rule' => "Редактирование правила",
 
     'All robots' => "Все роботы",
 
     'All statuses' => "Все статусы",
-    'Disabled' => "Автор изменений",
-    'Active' => "Автор изменений",
+    'Disabled' => "Не активно",
+    'Active' => "Активно",
 
     'All modes' => "Все режимы",
     'Allow' => "Allow",
@@ -64,6 +64,9 @@ return [
     'Add' => 'Добавить',
     'Edit' => 'Редактировать',
     'Delete' => 'Удалить',
+
+    'Robots.txt file not exists or unavailable by URL: {url}' => 'Файл Robots.txt не существует или недоступен по URL: {url}',
+    'Robots.txt file exists and available by URL: {url}' => 'Файл Robots.txt существует и доступен по URL: {url}',
 
     'First page' => 'Первая страница',
     'Last page' => 'Последняя страница',

@@ -1,11 +1,12 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use wdmg\widgets\SelectInput;
 
 /* @var $this yii\web\View */
-/* @var $source string */
+/* @var $path string */
 ?>
 
 <div class="robots-rule-view">
@@ -13,4 +14,36 @@ use wdmg\widgets\SelectInput;
         'class' => 'form-control',
         'rows' => 12
     ]) ?>
+    <hr/>
+    <?php
+        $webPath = Url::to($path, true);
+        $checkFailtureMessage = Yii::t('app/modules/robots', 'Robots.txt file not exists or unavailable by URL: {url}', [
+            'url' => Html::a($webPath, $webPath, [
+                'target' => "_blank",
+                'data-pjax' => "0"
+            ])
+        ]);
+        $checkSuccessMessage = Yii::t('app/modules/robots', 'Robots.txt file exists and available by URL: {url}', [
+            'url' => Html::a($webPath, $webPath, [
+                'target' => "_blank",
+                'data-pjax' => "0"
+            ])
+        ]);
+    ?>
+    <div id="robots-web-check"></div>
 </div>
+<?php $this->registerJs(<<< JS
+    $(function() {
+        $.ajax({
+            url:'$webPath',
+            type:'HEAD',
+            error: function() {
+                $('#robots-web-check').append('<div class="alert alert-danger">$checkFailtureMessage</div>');
+            },
+            success: function() {
+                $('#robots-web-check').append('<div class="alert alert-success">$checkSuccessMessage</div>');
+            }
+        });
+    });
+JS
+); ?>
