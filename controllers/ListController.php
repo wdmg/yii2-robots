@@ -132,6 +132,8 @@ class ListController extends Controller
             if (!$model->validate()) {
                 Yii::$app->response->format =  Response::FORMAT_JSON;
                 return ActiveForm::validate($model);
+            } else {
+                return true;
             }
         }
 
@@ -146,22 +148,31 @@ class ListController extends Controller
                     'danger',
                     Yii::t('app/modules/robots', 'An error occurred while add the rule.')
                 );
-
-            return $this->redirect(['index']);
         }
 
-        return $this->renderAjax('_form', [
-            'model' => $model,
-            'module' => $this->module
-        ]);
+        if (Yii::$app->request->isAjax)
+            return $this->renderAjax('_form', [
+                'model' => $model,
+                'module' => $this->module
+            ]);
+        else
+            return $this->redirect(['index']);
+
     }
 
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            if (!$model->validate()) {
+                Yii::$app->response->format =  Response::FORMAT_JSON;
+                return ActiveForm::validate($model);
+            } else {
+                return true;
+            }
+        }
 
-        if ($model->load(Yii::$app->request->post())) {
-
+        if (!Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
             if ($model->save())
                 Yii::$app->getSession()->setFlash(
                     'success',
@@ -172,14 +183,16 @@ class ListController extends Controller
                     'danger',
                     Yii::t('app/modules/robots', 'An error occurred while updating the rule.')
                 );
-
-            return $this->redirect(['index']);
         }
 
-        return $this->renderAjax('_form', [
-            'model' => $model,
-            'module' => $this->module
-        ]);
+        if (Yii::$app->request->isAjax)
+            return $this->renderAjax('_form', [
+                'model' => $model,
+                'module' => $this->module
+            ]);
+        else
+            return $this->redirect(['index']);
+
     }
 
     public function actionDelete($id)

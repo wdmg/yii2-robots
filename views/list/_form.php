@@ -40,7 +40,9 @@ use wdmg\widgets\SelectInput;
                 'class' => 'btn btn-default pull-left',
                 'data-dismiss' => 'modal'
             ]) ?>
-            <?= Html::submitButton(Yii::t('app/modules/robots', 'Save'), ['class' => 'btn btn-save btn-success pull-right']) ?>
+            <?= Html::submitButton(Yii::t('app/modules/robots', 'Save'), [
+                'class' => 'btn btn-save btn-success pull-right'
+            ]) ?>
         </div>
     </div>
     <?php ActiveForm::end(); ?>

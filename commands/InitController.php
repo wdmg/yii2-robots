@@ -39,18 +39,26 @@ class InitController extends Controller
         echo $name = $this->ansiFormat($welcome . "\n\n", Console::FG_GREEN);
         echo "Select the operation you want to perform:\n";
         echo "  1) Apply all module migrations\n";
-        echo "  2) Revert all module migrations\n\n";
+        echo "  2) Revert all module migrations\n";
+        echo "  3) Re-generate `robots.txt` file\n\n";
         echo "Your choice: ";
 
-        if(!is_null($this->choice))
+        if (!is_null($this->choice))
             $selected = $this->choice;
         else
             $selected = trim(fgets(STDIN));
 
         if ($selected == "1") {
-            Yii::$app->runAction('migrate/up', ['migrationPath' => '@vendor/wdmg/yii2-robots-txt/migrations', 'interactive' => true]);
-        } else if($selected == "2") {
-            Yii::$app->runAction('migrate/down', ['migrationPath' => '@vendor/wdmg/yii2-robots-txt/migrations', 'interactive' => true]);
+            Yii::$app->runAction('migrate/up', ['migrationPath' => '@vendor/wdmg/yii2-robots/migrations', 'interactive' => true]);
+        } else if ($selected == "2") {
+            Yii::$app->runAction('migrate/down', ['migrationPath' => '@vendor/wdmg/yii2-robots/migrations', 'interactive' => true]);
+        }  else if ($selected == "3") {
+
+            if ($this->module->genRobotsTxt())
+                echo $this->ansiFormat("Robots.txt has been successfully regenerated!\n", Console::FG_GREEN);
+            else
+                echo $this->ansiFormat("An error occurred while saving `robots.txt` file.\n", Console::FG_RED);
+
         } else {
             echo $this->ansiFormat("Error! Your selection has not been recognized.\n\n", Console::FG_RED);
             return ExitCode::UNSPECIFIED_ERROR;

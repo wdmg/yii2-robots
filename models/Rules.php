@@ -2,8 +2,12 @@
 
 namespace wdmg\robots\models;
 
-use wdmg\helpers\ArrayHelper;
 use Yii;
+use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
+use \yii\db\ActiveRecord;
+use wdmg\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%robots_rules}}".
@@ -24,7 +28,7 @@ use Yii;
  * @property Users $user
  */
 
-class Rules extends \yii\db\ActiveRecord
+class Rules extends ActiveRecord
 {
 
     const RULE_STATUS_DISABLED = 0;
@@ -48,6 +52,28 @@ class Rules extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
+    public function behaviors()
+    {
+        return [
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'created_at',
+                    ActiveRecord::EVENT_BEFORE_UPDATE => 'updated_at',
+                ],
+                'value' => new Expression('NOW()'),
+            ],
+            'blameable' => [
+                'class' => BlameableBehavior::class,
+                'createdByAttribute' => 'created_by',
+                'updatedByAttribute' => 'updated_by',
+            ]
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         $rules = [
@@ -61,7 +87,7 @@ class Rules extends \yii\db\ActiveRecord
         ];
 
         if (class_exists('\wdmg\users\models\Users')) {
-            $rules[] = [['created_by', 'updated_by'], 'required'];
+            $rules[] = [['created_by', 'updated_by'], 'safe'];
         }
 
         return $rules;
@@ -169,7 +195,7 @@ class Rules extends \yii\db\ActiveRecord
     public static function getPublished($asArray = false) {
         $query = self::find()->where(['status' => self::RULE_STATUS_ACTIVE])
             ->groupBy(['robot', 'rule'])
-            ->orderBy(['mode' => SORT_ASC, 'id' => SORT_DESC]);
+            ->orderBy(['mode' => SORT_ASC, 'robot' => SORT_DESC, 'id' => SORT_ASC]);
 
         if ($asArray)
             $query->asArray();

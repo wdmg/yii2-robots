@@ -6,9 +6,9 @@ namespace wdmg\robots;
  * Yii2 Robots.txt
  *
  * @category        Module
- * @version         0.0.1
+ * @version         1.0.0
  * @author          Alexsander Vyshnyvetskyy <alex.vyshnyvetskyy@gmail.com>
- * @link            https://github.com/wdmg/yii2-robots-txt
+ * @link            https://github.com/wdmg/yii2-robots
  * @copyright       Copyright (c) 2020 W.D.M.Group, Ukraine
  * @license         https://opensource.org/licenses/MIT Massachusetts Institute of Technology (MIT) License
  *
@@ -54,7 +54,7 @@ class Module extends BaseModule
     /**
      * @var string the module version
      */
-    private $version = "0.0.1";
+    private $version = "1.0.0";
 
     /**
      * @var integer, priority of initialization
@@ -164,31 +164,37 @@ class Module extends BaseModule
         if (!empty($output) && file_exists($path) && is_writable($path)) {
             $handle = fopen($path, 'w');
             if (fwrite($handle, $output)) {
-                Yii::$app->getSession()->setFlash(
-                    'success',
-                    Yii::t('app/modules/robots', 'Robots.txt has been successfully regenerated!')
-                );
+                if (!$this->isConsole()) {
+                    Yii::$app->getSession()->setFlash(
+                        'success',
+                        Yii::t('app/modules/robots', 'Robots.txt has been successfully regenerated!')
+                    );
+                }
                 fclose($handle);
                 return true;
             } else {
-                Yii::$app->getSession()->setFlash(
-                    'danger',
-                    Yii::t('app/modules/robots', 'An error occurred while saving `robots.txt` file.')
-                );
+                if (!$this->isConsole()) {
+                    Yii::$app->getSession()->setFlash(
+                        'danger',
+                        Yii::t('app/modules/robots', 'An error occurred while saving `robots.txt` file.')
+                    );
+                }
                 fclose($handle);
                 return false;
             }
         } else {
-            Yii::$app->getSession()->setFlash(
-                'danger',
-                Yii::t(
-                    'app/modules/robots',
-                    'Robots.txt by path `{path}` is not exists or not writable.',
-                    [
-                        'path' => $path
-                    ]
-                )
-            );
+            if (!$this->isConsole()) {
+                Yii::$app->getSession()->setFlash(
+                    'danger',
+                    Yii::t(
+                        'app/modules/robots',
+                        'Robots.txt by path `{path}` is not exists or not writable.',
+                        [
+                            'path' => $path
+                        ]
+                    )
+                );
+            }
         }
         return false;
     }

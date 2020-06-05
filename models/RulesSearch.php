@@ -17,8 +17,8 @@ class RulesSearch extends Rules
     public function rules()
     {
         return [
-            [['id', 'status', 'mode'], 'integer'],
-            [['robot', 'rule'], 'string'],
+            [['id'], 'integer'],
+            [['robot', 'status', 'mode', 'rule'], 'string'],
             [['created_at', 'created_by', 'updated_at', 'updated_by'], 'safe'],
         ];
     }
@@ -60,22 +60,23 @@ class RulesSearch extends Rules
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'rule' => $this->rule,
             'created_at' => $this->created_at,
             'created_by' => $this->created_by,
             'updated_at' => $this->updated_at,
             'updated_by' => $this->updated_by,
         ]);
 
+        if (!is_null($this->rule))
+            $query->andFilterWhere(['like', 'rule', $this->rule]);
 
-        if ($this->robot !== "*")
+        if ($this->robot !== "*" && $this->robot !== null)
             $query->andFilterWhere(['like', 'robot', $this->robot]);
 
-        if ($this->mode !== "*")
-            $query->andFilterWhere(['like', 'mode', $this->mode]);
+        if ($this->mode !== "*" && $this->mode !== null)
+            $query->andFilterWhere(['like', 'mode', intval($this->mode)]);
 
-        if ($this->status !== "*")
-            $query->andFilterWhere(['like', 'status', $this->status]);
+        if ($this->status !== "*" && $this->status !== null)
+            $query->andFilterWhere(['like', 'status', intval($this->status)]);
 
         return $dataProvider;
     }

@@ -4,7 +4,7 @@
   "keywords": ["yii2", "yii2-robots", "robots", "robots.txt", "wdmg"],
   "type": "yii2-extension",
   "license": "MIT",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "homepage": "https://github.com/wdmg/yii2-robots",
   "support": {
     "source": "https://github.com/wdmg/yii2-robots",
@@ -21,7 +21,7 @@
     }
   ],
   "require": {
-    "yiisoft/yii2": "^2.0.32",
+    "yiisoft/yii2": "^2.0.35",
     "wdmg/yii2-base": "^1.2.3",
     "wdmg/yii2-selectinput": "^1.0.9"
   },
