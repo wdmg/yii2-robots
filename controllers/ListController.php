@@ -63,31 +63,33 @@ class ListController extends Controller
 
     public function beforeAction($action)
     {
-        $path = Yii::getAlias($this->module->robotsWebRoot);
-        if (!file_exists($path)) {
-            Yii::$app->getSession()->setFlash(
-                'danger',
-                Yii::t(
-                    'app/modules/robots',
-                    'Robots.txt by path `{path}` is not exists.',
-                    [
-                        'path' => $path
-                    ]
-                )
-            );
-        }
+        if ($action->id !== 'generate') {
+            $path = Yii::getAlias($this->module->robotsWebRoot);
+            if (!file_exists($path)) {
+                Yii::$app->getSession()->setFlash(
+                    'danger',
+                    Yii::t(
+                        'app/modules/robots',
+                        'Robots.txt by path `{path}` is not exists.',
+                        [
+                            'path' => $path
+                        ]
+                    )
+                );
+            }
 
-        if (!is_writable($path)) {
-            Yii::$app->getSession()->setFlash(
-                'warning',
-                Yii::t(
-                    'app/modules/robots',
-                    'Robots.txt by path `{path}` is not writable.',
-                    [
-                        'path' => $path
-                    ]
-                )
-            );
+            if (!is_writable($path)) {
+                Yii::$app->getSession()->setFlash(
+                    'warning',
+                    Yii::t(
+                        'app/modules/robots',
+                        'Robots.txt by path `{path}` is not writable.',
+                        [
+                            'path' => $path
+                        ]
+                    )
+                );
+            }
         }
 
         return parent::beforeAction($action);
@@ -138,16 +140,35 @@ class ListController extends Controller
         }
 
         if (!Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
-            if ($model->save())
+            if ($model->save()) {
+
+                // Log activity
+                $this->module->logActivity(
+                    'Robots.txt rule with ID `' . $model->id . '` has been successfully added.',
+                    $this->uniqueId . ":" . $this->action->id,
+                    'success',
+                    1
+                );
+
                 Yii::$app->getSession()->setFlash(
                     'success',
                     Yii::t('app/modules/robots', 'Robots.txt rule has been successfully added!')
                 );
-            else
+            } else {
+
+                // Log activity
+                $this->module->logActivity(
+                    'An error occurred while add the new Robots.txt rule.',
+                    $this->uniqueId . ":" . $this->action->id,
+                    'danger',
+                    1
+                );
+
                 Yii::$app->getSession()->setFlash(
                     'danger',
                     Yii::t('app/modules/robots', 'An error occurred while add the rule.')
                 );
+            }
         }
 
         if (Yii::$app->request->isAjax)
@@ -173,16 +194,35 @@ class ListController extends Controller
         }
 
         if (!Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
-            if ($model->save())
+            if ($model->save()) {
+
+                // Log activity
+                $this->module->logActivity(
+                    'Robots.txt rule with ID `' . $model->id . '` has been successfully updated.',
+                    $this->uniqueId . ":" . $this->action->id,
+                    'success',
+                    1
+                );
+
                 Yii::$app->getSession()->setFlash(
                     'success',
                     Yii::t('app/modules/robots', 'Robots.txt rule has been successfully updated!')
                 );
-            else
+            } else {
+
+                // Log activity
+                $this->module->logActivity(
+                    'An error occurred while update the Robots.txt rule with ID `' . $model->id . '`.',
+                    $this->uniqueId . ":" . $this->action->id,
+                    'danger',
+                    1
+                );
+
                 Yii::$app->getSession()->setFlash(
                     'danger',
                     Yii::t('app/modules/robots', 'An error occurred while updating the rule.')
                 );
+            }
         }
 
         if (Yii::$app->request->isAjax)
@@ -197,9 +237,17 @@ class ListController extends Controller
 
     public function actionDelete($id)
     {
-
         $model = $this->findModel($id);
         if ($model->delete()) {
+
+            // Log activity
+            $this->module->logActivity(
+                'Robots.txt rule with ID `' . $model->id . '` has been successfully deleted.',
+                $this->uniqueId . ":" . $this->action->id,
+                'success',
+                1
+            );
+
             Yii::$app->getSession()->setFlash(
                 'success',
                 Yii::t(
@@ -208,6 +256,15 @@ class ListController extends Controller
                 )
             );
         } else {
+
+            // Log activity
+            $this->module->logActivity(
+                'An error occurred while deleting the Robots.txt rule with ID `' . $model->id . '`.',
+                $this->uniqueId . ":" . $this->action->id,
+                'danger',
+                1
+            );
+
             Yii::$app->getSession()->setFlash(
                 'danger',
                 Yii::t(
@@ -232,7 +289,23 @@ class ListController extends Controller
     }
 
     public function actionGenerate() {
-        $this->module->genRobotsTxt();
+        if ($this->module->genRobotsTxt()) {
+            // Log activity
+            $this->module->logActivity(
+                'Robots.txt rules has been successfully regenerated.',
+                $this->uniqueId . ":" . $this->action->id,
+                'success',
+                1
+            );
+        } else {
+            // Log activity
+            $this->module->logActivity(
+                'An error occurred while regenerate the Robots.txt rules.',
+                $this->uniqueId . ":" . $this->action->id,
+                'danger',
+                1
+            );
+        }
         $this->redirect(['index']);
     }
 

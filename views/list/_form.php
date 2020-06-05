@@ -25,7 +25,10 @@ use wdmg\widgets\SelectInput;
         ]
     ])->label(Yii::t('app/modules/robots','Directive')); ?>
 
-    <?= $form->field($model, 'rule')->textInput(['placeholder' => "Enter rule path or value..."]) ?>
+    <?= $form->field($model, 'rule')->textInput([
+        'placeholder' => "Enter rule path or value...",
+        'autocomplete' => 'off'
+    ]) ?>
 
     <?= $form->field($model, 'status')->widget(SelectInput::class, [
         'items' => $model->getStatusesList(),

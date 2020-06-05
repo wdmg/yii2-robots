@@ -10,11 +10,6 @@ use wdmg\widgets\SelectInput;
 ?>
 
 <div class="robots-rule-view">
-    <?= Html::textarea('robots-txt-source', $source, [
-        'class' => 'form-control',
-        'rows' => 12
-    ]) ?>
-    <hr/>
     <?php
         $webPath = Url::to($path, true);
         $checkFailtureMessage = Yii::t('app/modules/robots', 'Robots.txt file not exists or unavailable by URL: {url}', [
@@ -31,6 +26,10 @@ use wdmg\widgets\SelectInput;
         ]);
     ?>
     <div id="robots-web-check"></div>
+    <?= Html::textarea('robots-txt-source', $source, [
+        'class' => 'form-control',
+        'rows' => 12
+    ]) ?>
 </div>
 <?php $this->registerJs(<<< JS
     $(function() {

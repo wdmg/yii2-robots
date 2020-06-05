@@ -161,16 +161,14 @@ class Module extends BaseModule
         }
 
         $path = Yii::getAlias($this->robotsWebRoot);
-        if (!empty($output) && file_exists($path) && is_writable($path)) {
-            $handle = fopen($path, 'w');
-            if (fwrite($handle, $output)) {
+        if (!empty($output)) {
+            if (file_put_contents($path, $output)) {
                 if (!$this->isConsole()) {
                     Yii::$app->getSession()->setFlash(
                         'success',
                         Yii::t('app/modules/robots', 'Robots.txt has been successfully regenerated!')
                     );
                 }
-                fclose($handle);
                 return true;
             } else {
                 if (!$this->isConsole()) {
@@ -179,21 +177,6 @@ class Module extends BaseModule
                         Yii::t('app/modules/robots', 'An error occurred while saving `robots.txt` file.')
                     );
                 }
-                fclose($handle);
-                return false;
-            }
-        } else {
-            if (!$this->isConsole()) {
-                Yii::$app->getSession()->setFlash(
-                    'danger',
-                    Yii::t(
-                        'app/modules/robots',
-                        'Robots.txt by path `{path}` is not exists or not writable.',
-                        [
-                            'path' => $path
-                        ]
-                    )
-                );
             }
         }
         return false;

@@ -1,7 +1,9 @@
 Changelog
 =========
  
-## 1.0.0 (2020-06-05)
+## 1.0.0 (2020-06-06)
+ * Added activity log
+ * Added console operations
  * Filtering in GridView
  * Rename repository, translations
  * Added CRUD for manage rules
