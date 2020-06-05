@@ -60,7 +60,6 @@ class RulesSearch extends Rules
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'robot' => $this->robot,
             'rule' => $this->rule,
             'created_at' => $this->created_at,
             'created_by' => $this->created_by,
@@ -68,6 +67,9 @@ class RulesSearch extends Rules
             'updated_by' => $this->updated_by,
         ]);
 
+
+        if ($this->robot !== "*")
+            $query->andFilterWhere(['like', 'robot', $this->robot]);
 
         if ($this->mode !== "*")
             $query->andFilterWhere(['like', 'mode', $this->mode]);

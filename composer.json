@@ -32,7 +32,8 @@
   },
   "extra": {
     "options": {
-      "routePrefix": "admin"
+      "routePrefix": "admin",
+      "robotsWebRoot": "@webroot/robots.txt"
     }
   }
 }

@@ -5,10 +5,13 @@ namespace wdmg\robots\controllers;
 use Yii;
 use wdmg\robots\models\Rules;
 use wdmg\robots\models\RulesSearch;
+use yii\helpers\FileHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 /**
  * ListController implements the CRUD actions for Rules model.
@@ -24,7 +27,11 @@ class ListController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'index' => ['get'],
+                    'index' => ['get', 'post'],
+                    'update' => ['get', 'post'],
+                    'delete' => ['post'],
+                    'view' => ['get'],
+                    'generate' => ['get'],
                 ],
             ],
             'access' => [
@@ -54,18 +61,165 @@ class ListController extends Controller
         return $behaviors;
     }
 
+    public function beforeAction($action)
+    {
+        $path = Yii::getAlias($this->module->robotsWebRoot);
+        if (!file_exists($path)) {
+            Yii::$app->getSession()->setFlash(
+                'danger',
+                Yii::t(
+                    'app/modules/robots',
+                    'Robots.txt by path `{path}` is not exists.',
+                    [
+                        'path' => $path
+                    ]
+                )
+            );
+        }
+
+        if (!is_writable($path)) {
+            Yii::$app->getSession()->setFlash(
+                'warning',
+                Yii::t(
+                    'app/modules/robots',
+                    'Robots.txt by path `{path}` is not writable.',
+                    [
+                        'path' => $path
+                    ]
+                )
+            );
+        }
+
+        return parent::beforeAction($action);
+    }
+
     /**
      * Lists all models.
      * @return mixed
      */
     public function actionIndex()
     {
+        if (Yii::$app->request->isAjax) {
+            if (Yii::$app->request->get('change') == "status") {
+                if (Yii::$app->request->post('id', null)) {
+                    $id = Yii::$app->request->post('id');
+                    $status = Yii::$app->request->post('value', 0);
+                    $model = $this->findModel(intval($id));
+                    if ($model) {
+                        $model->status = $status;
+                        if ($model->update())
+                            return true;
+                        else
+                            return false;
+                    }
+                }
+            }
+        }
+
         $searchModel = new RulesSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    public function actionCreate()
+    {
+
+        $model = new Rules();
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            if (!$model->validate()) {
+                Yii::$app->response->format =  Response::FORMAT_JSON;
+                return ActiveForm::validate($model);
+            }
+        }
+
+        if (!Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            if ($model->save())
+                Yii::$app->getSession()->setFlash(
+                    'success',
+                    Yii::t('app/modules/robots', 'Robots.txt rule has been successfully added!')
+                );
+            else
+                Yii::$app->getSession()->setFlash(
+                    'danger',
+                    Yii::t('app/modules/robots', 'An error occurred while add the rule.')
+                );
+
+            return $this->redirect(['index']);
+        }
+
+        return $this->renderAjax('_form', [
+            'model' => $model,
+            'module' => $this->module
+        ]);
+    }
+
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if ($model->save())
+                Yii::$app->getSession()->setFlash(
+                    'success',
+                    Yii::t('app/modules/robots', 'Robots.txt rule has been successfully updated!')
+                );
+            else
+                Yii::$app->getSession()->setFlash(
+                    'danger',
+                    Yii::t('app/modules/robots', 'An error occurred while updating the rule.')
+                );
+
+            return $this->redirect(['index']);
+        }
+
+        return $this->renderAjax('_form', [
+            'model' => $model,
+            'module' => $this->module
+        ]);
+    }
+
+    public function actionDelete($id)
+    {
+
+        $model = $this->findModel($id);
+        if ($model->delete()) {
+            Yii::$app->getSession()->setFlash(
+                'success',
+                Yii::t(
+                    'app/modules/robots',
+                    'OK! Rule successfully deleted.'
+                )
+            );
+        } else {
+            Yii::$app->getSession()->setFlash(
+                'danger',
+                Yii::t(
+                    'app/modules/robots',
+                    'An error occurred while deleting the rule.'
+                )
+            );
+        }
+
+        return $this->redirect(['index']);
+    }
+
+    public function actionView() {
+        if (Yii::$app->request->isAjax) {
+            $source = $this->module->getRobotsTxt();
+            return $this->renderAjax('_view', [
+                'source' => $source
+            ]);
+        }
+        $this->redirect(['index']);
+    }
+
+    public function actionGenerate() {
+        $this->module->genRobotsTxt();
+        $this->redirect(['index']);
     }
 
     /**
