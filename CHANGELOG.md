@@ -1,6 +1,9 @@
 Changelog
 =========
  
+## 1.0.1 (2020-06-14)
+ * Update README.md and dependencies
+ 
 ## 1.0.0 (2020-06-06)
  * Added activity log
  * Added console operations

@@ -4,8 +4,14 @@
 ![Progress](https://img.shields.io/badge/progress-ready_to_use-green.svg)
 [![GitHub license](https://img.shields.io/github/license/wdmg/yii2-robots.svg)](https://github.com/wdmg/yii2-robots/blob/master/LICENSE)
 
+<img src="./docs/images/yii2-robots.png" width="100%" alt="Yii2 Robots.txt" />
+
 # Yii2 Robots.txt
-Automatically generating and edit the robots.txt file
+Automatically generating and edit the robots.txt file.
+
+This module is an integral part of the [Butterfly.СMS](https://butterflycms.com/) content management system, but can also be used as an standalone extension.
+
+Copyrights (c) 2020 [W.D.M.Group, Ukraine](https://wdmg.com.ua/)
 
 # Requirements 
 * PHP 5.6 or higher
@@ -60,5 +66,6 @@ Use the `Module::dashboardNavItems()` method of the module to generate a navigat
     ?>
 
 # Status and version [ready to use]
+* v.1.0.1 - Update README.md and dependencies
 * v.1.0.0 - Added console operations and activity log
 * v.0.0.1 - Added base migrations, bootstrap, base module and models
