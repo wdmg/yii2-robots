@@ -167,10 +167,10 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'maxButtonCount' => 5,
             'activePageCssClass' => 'active',
-            'prevPageCssClass' => '',
-            'nextPageCssClass' => '',
-            'firstPageCssClass' => 'previous',
-            'lastPageCssClass' => 'next',
+            'prevPageCssClass' => 'prev',
+            'nextPageCssClass' => 'next',
+            'firstPageCssClass' => 'first',
+            'lastPageCssClass' => 'last',
             'firstPageLabel' => Yii::t('app/modules/robots', 'First page'),
             'lastPageLabel'  => Yii::t('app/modules/robots', 'Last page'),
             'prevPageLabel'  => Yii::t('app/modules/robots', '&larr; Prev page'),
@@ -210,15 +210,17 @@ $this->params['breadcrumbs'][] = $this->title;
         $container.delegate(\'[data-toggle="button-switcher"] button\', \'click\', function() {
             var id = $(this).parent(\'.btn-group\').data(\'id\');
             var value = $(this).data(\'value\');
-             $.ajax({
+            let url = new URL(requestURL);
+            url.searchParams.set(\'change\', \'status\');            
+            $.ajax({
                 type: "POST",
-                url: requestURL + \'?change=status\',
+                url: url.toString(),
                 dataType: \'json\',
                 data: {\'id\': id, \'value\': value},
                 complete: function(data) {
                     $.pjax.reload({type:\'POST\', container:\'#robotsRulesAjax\'});
                 }
-             });
+            });
         });
     }
     ', \yii\web\View::POS_READY
