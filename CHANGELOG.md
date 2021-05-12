@@ -1,6 +1,9 @@
 Changelog
 =========
  
+## 1.0.*
+ * Show modal call fixed
+ 
 ## 1.0.1 (2020-06-14)
  * Update README.md and dependencies
  

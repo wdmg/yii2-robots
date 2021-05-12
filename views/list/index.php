@@ -152,8 +152,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         return Html::a('<span class="glyphicon glyphicon-pencil"></span>',
                             Url::toRoute(['list/update', 'id' => $data['id']]), [
                                 'title' => Yii::t('app/modules/robots', 'Update rule'),
-                                'class' => 'update-rule',
-                                'data-toggle' => 'updateRuleForm',
+                                'data-toggle' => '#updateRuleModal',
                                 'data-id' => $key,
                                 'data-pjax' => '1'
                             ]);
@@ -185,16 +184,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 'data-pjax' => '0'
             ]) ?>
             <?= Html::a(Yii::t('app/modules/robots', 'View robots.txt'), ['view'], [
-                'class' => 'btn btn-info view-robots',
+                'class' => 'btn btn-info',
                 'data-toggle' => 'modal',
-                'data-target' => '#viewRobotsTxt',
+                'data-target' => '#viewRobotsTxtModal',
                 'data-pjax' => '1'
             ]) ?>
         </div>
         <?= Html::a(Yii::t('app/modules/robots', 'Add new rule'), ['create'], [
-            'class' => 'btn btn-add btn-success add-rule pull-right',
+            'class' => 'btn btn-add btn-success pull-right',
             'data-toggle' => 'modal',
-            'data-target' => '#addRuleForm',
+            'data-target' => '#addRuleModal',
             'data-pjax' => '1'
         ]) ?>
     </div>
@@ -203,65 +202,62 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?php echo $this->render('../_debug'); ?>
 
-<?php $this->registerJs(
-    'var $container = $("#robotsRulesAjax");
+<?php
+$this->registerJs(<<< JS
+    var container = $("#robotsRulesAjax");
     var requestURL = window.location.href;
-    if ($container.length > 0) {
-        $container.delegate(\'[data-toggle="button-switcher"] button\', \'click\', function() {
-            var id = $(this).parent(\'.btn-group\').data(\'id\');
-            var value = $(this).data(\'value\');
+    if (container.length > 0) {
+        container.delegate('[data-toggle="button-switcher"] button', 'click', function() {
+            var id = $(this).parent('.btn-group').data('id');
+            var value = $(this).data('value');
             let url = new URL(requestURL);
-            url.searchParams.set(\'change\', \'status\');            
+            url.searchParams.set('change', 'status');            
             $.ajax({
                 type: "POST",
                 url: url.toString(),
-                dataType: \'json\',
-                data: {\'id\': id, \'value\': value},
+                dataType: 'json',
+                data: {'id': id, 'value': value},
                 complete: function(data) {
-                    $.pjax.reload({type:\'POST\', container:\'#robotsRulesAjax\'});
+                    $.pjax.reload({type:'POST', container:'#robotsRulesAjax'});
                 }
             });
         });
     }
-    ', \yii\web\View::POS_READY
-); ?>
+JS
+, \yii\web\View::POS_READY); ?>
 
-<?php $this->registerJs(<<< JS
-    $('body').delegate('.add-rule', 'click', function(event) {
+<?php
+$this->registerJs(<<< JS
+    $('body').delegate('[data-toggle="modal"][data-target]', 'click', function(event) {
+        
         event.preventDefault();
+        var target = $(event.target).data('target');
         $.get(
             $(this).attr('href'),
             function (data) {
-                $('#addRuleForm .modal-body').html(data);
-                $('#addRuleForm').modal();
-            }
-        );
-    });
-    $('body').delegate('.update-rule', 'click', function(event) {
-        event.preventDefault();
-        $.get(
-            $(this).attr('href'),
-            function (data) {
-                $('#updateRuleForm .modal-body').html(data);
-                $('#updateRuleForm').modal();
-            }
-        );
-    });
-    $('body').delegate('.view-robots', 'click', function(event) {
-        event.preventDefault();
-        $.get(
-            $(this).attr('href'),
-            function (data) {
-                $('#viewRobotsTxt .modal-body').html(data);
-                $('#viewRobotsTxt').modal();
-            }
+                
+                $(target).find('.modal-body').html($(data).remove('.modal-footer'));
+                if ($(data).find('.modal-footer').length > 0) {
+                    $(target).find('.modal-footer').remove();
+                    $(target).find('.modal-content').append($(data).find('.modal-footer'));
+                }
+                
+                if ($(target).find('button[type="submit"]').length > 0 && $(target).find('form').length > 0) {
+                    $(target).find('button[type="submit"]').on('click', function(event) {
+                        event.preventDefault();
+                        $(target).find('form').submit();
+                    });
+                }
+                
+                $(target).modal();
+            }  
         );
     });
 JS
 ); ?>
 
 <?php Modal::begin([
-    'id' => 'addRuleForm',
+    'id' => 'addRuleModal',
     'header' => '<h4 class="modal-title">'.Yii::t('app/modules/robots', 'Add new rule').'</h4>',
     'clientOptions' => [
         'show' => false
@@ -270,7 +266,7 @@ JS
 <?php Modal::end(); ?>
 
 <?php Modal::begin([
-    'id' => 'updateRuleForm',
+    'id' => 'updateRuleModal',
     'header' => '<h4 class="modal-title">'.Yii::t('app/modules/robots', 'Update rule').'</h4>',
     'clientOptions' => [
         'show' => false
@@ -279,7 +275,7 @@ JS
 <?php Modal::end(); ?>
 
 <?php Modal::begin([
-    'id' => 'viewRobotsTxt',
+    'id' => 'viewRobotsTxtModal',
     'header' => '<h4 class="modal-title">'.Yii::t('app/modules/robots', 'View robots.txt').'</h4>',
     'clientOptions' => [
         'show' => false
