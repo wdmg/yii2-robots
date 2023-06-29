@@ -66,6 +66,7 @@ Use the `Module::dashboardNavItems()` method of the module to generate a navigat
     ?>
 
 # Status and version [ready to use]
+* v.1.1.0 - Update copyrights, fix nav menu
 * v.1.0.1 - Update README.md and dependencies
 * v.1.0.0 - Added console operations and activity log
 * v.0.0.1 - Added base migrations, bootstrap, base module and models
